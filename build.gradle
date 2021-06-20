@@ -1,0 +1,79 @@
+apply plugin: 'java-library'
+apply plugin: 'checkstyle'
+apply plugin: 'maven-publish'
+
+group 'fr.fuluty.plugin.creative.bluemap'
+version '1.0.31-SNAPSHOT'
+
+compileJava.sourceCompatibility = JavaVersion.VERSION_11
+compileJava.options.encoding = 'UTF-8'
+
+libsDirName = "$rootProject.projectDir"
+
+processResources {
+    inputs.property("version", project.version)
+    //noinspection UnnecessaryQualifiedReference
+    filter org.apache.tools.ant.filters.ReplaceTokens, tokens: [ 'VERSION': project.version ]
+}
+
+checkstyle {
+    configDirectory = rootProject.file('assets/checkstyle')
+}
+
+configurations {
+    shaded
+    compile.extendsFrom shaded
+}
+
+afterEvaluate {
+    jar {
+        dependsOn configurations.shaded
+        from configurations.shaded.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+repositories {
+    maven { url 'https://hub.spigotmc.org/nexus/content/groups/public/' }
+    maven { url 'https://maven.enginehub.org/repo/' }
+    maven { url 'https://mvn.intellectualsites.com/content/groups/public/' }
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compileOnly 'org.jetbrains:annotations:20.1.0'
+
+    api 'com.intellectualsites.fawe:FAWE-Bukkit:1.16-725'
+    api 'com.plotsquared:PlotSquared-Core:5.13.3'
+    api 'com.github.BlueMap-Minecraft:BlueMapAPI:v1.5.0'
+    api 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    api 'org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT'
+}
+
+task incrementVersion {
+    doLast {
+        String[] versions = project.version.split( "-" )[ 0 ].split( "[.]" )
+        versions[ versions.length - 1 ] = Integer.parseInt( versions[ versions.length - 1 ] ) + 1
+        buildFile.setText( buildFile.getText().replaceFirst( "version '$version'" , "version '" + String.join( ".", versions ) + "-SNAPSHOT'" ) )
+    }
+}
+
+task removeLastJar {
+    doFirst {
+        String[] versions = project.version.split( "-" )[ 0 ].split( "[.]" )
+        versions[ versions.length - 1 ] = Integer.parseInt( versions[ versions.length - 1 ] ) - 1
+        delete project.name + "-" + String.join( ".", versions ) + "-SNAPSHOT.jar"
+    }
+}

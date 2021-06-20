@@ -1,0 +1,8 @@
+name: BlueMap2PlotSquared
+version: @VERSION@
+author: Herox
+main: fr.fuluty.plugin.bluemap.plotsquared.BlueMap2PlotSquared
+api-version: 1.16
+depend:
+  - BlueMap
+  - PlotSquared
