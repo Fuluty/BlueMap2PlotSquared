@@ -3,7 +3,7 @@ apply plugin: 'checkstyle'
 apply plugin: 'maven-publish'
 
 group 'fr.fuluty.plugin.creative.bluemap'
-version '1.0.31-SNAPSHOT'
+version '1.0.32-SNAPSHOT'
 
 compileJava.sourceCompatibility = JavaVersion.VERSION_11
 compileJava.options.encoding = 'UTF-8'
